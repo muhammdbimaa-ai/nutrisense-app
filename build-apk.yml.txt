@@ -1,0 +1,75 @@
+name: Build APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cek isi repositori
+        run: |
+          echo "== Isi repositori =="; ls -la
+          echo "== Isi folder www =="
+          ls -la www || { echo "GAGAL: folder www tidak ada. Upload ulang isi zip (folder www harus ada di halaman utama repositori)."; exit 1; }
+          test -f www/index.html || { echo "GAGAL: www/index.html tidak ada."; exit 1; }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - name: Kunci tanda tangan tetap (agar APK baru bisa menimpa aplikasi lama)
+        run: |
+          mkdir -p ~/.android
+          echo "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" | base64 -d > ~/.android/debug.keystore
+      - name: Tulis konfigurasi aplikasi (nama Workout)
+        run: |
+          cat > capacitor.config.json <<'EOF'
+          {
+            "appId": "id.nutrisense.app",
+            "appName": "NutriSense",
+            "webDir": "www",
+            "plugins": { "LocalNotifications": { "smallIcon": "ic_stat_latihan", "iconColor": "#2B50E6" } }
+          }
+          EOF
+      - name: Pasang Capacitor
+        run: |
+          [ -f package.json ] || npm init -y
+          npm install @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7
+      - name: Buat proyek Android
+        run: npx cap add android
+      - name: Ikon, izin, dan suara alarm
+        run: |
+          cat > /tmp/patch.mjs <<'EOF'
+          import fs from 'fs';
+          const res = 'android/app/src/main/res', man = 'android/app/src/main/AndroidManifest.xml';
+          let x = fs.readFileSync(man, 'utf8');
+          for (const p of ['POST_NOTIFICATIONS', 'VIBRATE', 'WAKE_LOCK', 'USE_EXACT_ALARM', 'SCHEDULE_EXACT_ALARM']) {
+            if (!x.includes('android.permission.' + p + '"')) x = x.replace('<application', '<uses-permission android:name="android.permission.' + p + '" />\n    <application');
+          }
+          fs.writeFileSync(man, x); console.log('OK izin');
+          const icon = fs.readFileSync('www/icon-192.png');
+          for (const d of ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi']) {
+            fs.mkdirSync(res + '/mipmap-' + d, { recursive: true });
+            for (const n of ['ic_launcher.png', 'ic_launcher_round.png']) fs.writeFileSync(res + '/mipmap-' + d + '/' + n, icon);
+          }
+          fs.rmSync(res + '/mipmap-anydpi-v26', { recursive: true, force: true }); console.log('OK ikon');
+          fs.mkdirSync(res + '/drawable', { recursive: true });
+          fs.writeFileSync(res + '/drawable/ic_stat_latihan.xml', '<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24"><path android:fillColor="#FFFFFFFF" android:pathData="M7,11h10v2H7zM4,8h2v8H4zM18,8h2v8h-2zM2,10h2v4H2zM20,10h2v4h-2z"/></vector>');
+          const sr = 22050, n = sr * 8, b = Buffer.alloc(44 + n * 2);
+          b.write('RIFF', 0); b.writeUInt32LE(36 + n * 2, 4); b.write('WAVEfmt ', 8); b.writeUInt32LE(16, 16); b.writeUInt16LE(1, 20); b.writeUInt16LE(1, 22);
+          b.writeUInt32LE(sr, 24); b.writeUInt32LE(sr * 2, 28); b.writeUInt16LE(2, 32); b.writeUInt16LE(16, 34); b.write('data', 36); b.writeUInt32LE(n * 2, 40);
+          for (let i = 0; i < n; i++) {
+            const t = i / sr, ph = t % 1.2; let a = 0;
+            for (const st of [0, 0.3, 0.6]) if (ph >= st && ph < st + 0.2) { const u = (ph - st) / 0.2; a = Math.min(u * 15, (1 - u) * 15, 1); }
+            b.writeInt16LE(Math.round(32767 * 0.6 * a * Math.sin(2 * Math.PI * 1000 * t)), 44 + i * 2);
+          }
+          fs.mkdirSync(res + '/raw', { recursive: true }); fs.writeFileSync(res + '/raw/rest_done.wav', b); console.log('OK suara');
+          EOF
+          node /tmp/patch.mjs
+      - run: npx cap sync android
+      - run: cd android && chmod +x gradlew && ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Workout-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
